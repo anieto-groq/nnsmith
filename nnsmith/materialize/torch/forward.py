@@ -446,7 +446,8 @@ def forward_fn(op: Concat):
 
 @operator_impl(Cast)
 def forward_fn(op: Cast):
-    return lambda x: x.to(dtype=op.extra_attrs["to"].torch())
+    dtype = op.extra_attrs["to"].torch()
+    return lambda x: x.to(dtype=dtype)
 
 
 @operator_impl(MatMul)

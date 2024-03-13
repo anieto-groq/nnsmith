@@ -120,6 +120,7 @@ class SymbolNet(nn.Module):
 
         self._device = None
         self.ir = ir
+        self.differentiable = False
 
         for i, inst in enumerate(self.ir.insts):
             if not isinstance(inst.iexpr.op, Input):
@@ -358,13 +359,13 @@ class SymbolNet(nn.Module):
         return tensor_map
 
     def forward(self, *args):
-        self.differentiable = True
+        # self.differentiable = True
 
         tensor_map: Dict[str, torch.Tensor] = self.make_param_map()
         for i, key in enumerate(self.input_map.keys()):
             tensor_map[key] = args[i]
 
-        debug_numeric(tensor_map)
+        # debug_numeric(tensor_map)
 
         for stmt_idx, (inst, inps, outs, op) in enumerate(self.instructions):
             input_tensors = [tensor_map[idx] for idx in inps]
@@ -385,11 +386,11 @@ class SymbolNet(nn.Module):
                 # put values back to tensor_map.
                 tensor_map[out_key] = output_tensors[i]
                 # Check differentiability.
-                self.differentiable &= output_tensors[i].grad_fn is not None
+                # self.differentiable &= output_tensors[i].grad_fn is not None
 
-            debug_io(stmt_idx, input_tensors, output_tensors)
+            # debug_io(stmt_idx, input_tensors, output_tensors)
 
-        self.first_run = False
+        # self.first_run = False
         return tuple(tensor_map[key] for key in self.output_map)
 
     def forward_grad(self, *args):
