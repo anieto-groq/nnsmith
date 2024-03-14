@@ -3,7 +3,7 @@ import os
 import random
 import time
 
-import hydra
+# import hydra
 from omegaconf import DictConfig
 
 from nnsmith.abstract.extension import activate_ext
@@ -15,7 +15,7 @@ from nnsmith.narrow_spec import auto_opset
 from nnsmith.util import hijack_patch_requires, mkdir, op_filter
 
 
-@hydra.main(version_base=None, config_path="../config", config_name="main")
+# @hydra.main(version_base=None, config_path="../config", config_name="main")
 def main(cfg: DictConfig):
     # Generate a random ONNX model
     # TODO(@ganler): clean terminal outputs.
@@ -48,7 +48,7 @@ def main(cfg: DictConfig):
         grad=mgen_cfg["grad_check"],
     )
     opset = op_filter(opset, mgen_cfg["include"], mgen_cfg["exclude"])
-    hijack_patch_requires(mgen_cfg["patch_requires"])
+    # hijack_patch_requires(mgen_cfg["patch_requires"])
     activate_ext(opset=opset, factory=factory)
 
     tgen_begin = time.time()
@@ -102,4 +102,27 @@ def main(cfg: DictConfig):
 
 
 if __name__ == "__main__":
-    main()
+    main(
+        {
+            "mgen": {
+                "seed": None,
+                "vulops": None,
+                "grad_check": False,
+                "include": None,
+                "exclude": None,
+                "patch_requires": None,
+                "method": "symbolic",
+                "max_elem_per_tensor": 10,
+                "max_nodes": 10,
+                "timeout_ms": 20000,
+                "rank_choices": None,
+                "dtype_choices": None,
+                "save": "foo",
+            },
+            "model": {"type": "torch"},
+            "backend": {"target": "torchjit", "type": None},
+            "debug": {
+                "viz": False,
+            }
+        }
+    )
